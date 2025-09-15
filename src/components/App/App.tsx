@@ -1,35 +1,47 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import Modal from '../Modal/Modal';
+import NoteForm from '../NoteForm/NoteForm';
+import NoteList from '../NoteList/Notelist';
+import css from './App.module.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [isOpenModal, setIsOpenModal] = useState(false);
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className={css.app}>
+        <header className={css.toolbar}>
+          {/* Компонент SearchBox */}
+          {/* Пагінація */}
+          <button
+            className={css.button}
+            onClick={() => setIsOpenModal(true)}
+          >
+            Create note +
+          </button>
+        </header>
+
+        <NoteList
+          notes={[
+            {
+              id: '1',
+              title: 'Перша нотатка',
+              content: 'Це зміст першої нотатки',
+              tag: 'Work',
+              createdAt: '2024-10-01T10:00:00Z',
+              updatedAt: '2024-10-01T10:00:00Z',
+            },
+          ]}
+        />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+
+      {isOpenModal && (
+        <Modal onClose={() => setIsOpenModal(false)}>
+          <NoteForm onCancel={() => setIsOpenModal(false)} />
+        </Modal>
+      )}
     </>
-  )
+  );
 }
 
-export default App
+export default App;
