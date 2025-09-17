@@ -6,26 +6,26 @@ import type { Note } from "../types/note";
 export const api = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
   headers: {
-    Authorization: `Bearer ${import.meta.env.VITE_NOTEHUB_TOKEN}`,
+    Authorization: `${import.meta.env.VITE_NOTEHUB_TOKEN}`,
   },
 });
 
 // Тип відповіді для колекції нотаток
 export interface NotesResponse {
-  results: Note[];
+  notes: Note[];
   totalPages: number;
   totalResults: number;
 }
 
 // 1. Отримати список нотаток (підтримує пагінацію та пошук)
 export async function fetchNotes(
-  query?: string,
+  search?: string,
   page: number = 1
 ): Promise<NotesResponse> {
   const response: AxiosResponse<NotesResponse> = await api.get("/notes", {
     params: {
       page,
-      ...(query ? { query } : {}),
+      ...(search ? { search } : {}),
     },
   });
   return response.data;

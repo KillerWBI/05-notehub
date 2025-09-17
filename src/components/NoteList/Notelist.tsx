@@ -5,9 +5,10 @@ interface NoteListProps {
   notes: Note[];
 }
 
-export default function NoteList({ notes }: NoteListProps) {
+export default function NoteList({ notes = [] }: NoteListProps) {
   if (notes.length === 0) {
     return null; // нічого не рендеримо, якщо масив пустий
+
   }
 
   return (
