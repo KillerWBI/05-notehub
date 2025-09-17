@@ -1,26 +1,51 @@
-import { useQuery } from "@tanstack/react-query";
-import { useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from 'react';
 import { useDebounce } from "use-debounce";
 import type { NotesResponse } from "../../services/noteService";
-import { fetchNotes } from "../../services/noteService";
+import { deleteNote, fetchNotes } from "../../services/noteService";
 import Modal from '../Modal/Modal';
 import NoteForm from '../NoteForm/NoteForm';
 import NoteList from '../NoteList/Notelist';
+import Pagination from "../Pagination/Pagination";
 import SearchBox from "../SearcBox/SearchBox";
 import css from './App.module.css';
 
+
 function App() {
+  const queryClient = useQueryClient();
+
   const [isOpenModal, setIsOpenModal] = useState(false);
-  const [query, setQuery] = useDebounce<string>('', 1000);
+  const [query, setQuery] = useDebounce<string>('', 500);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { data, isLoading, error } = useQuery<NotesResponse>({
-    queryKey: ['notes', query],
-    queryFn: () => fetchNotes(query, 1),
-    enabled: true, // Виконуємо запит одразу при монтуванні компонента
+    queryKey: ['notes', query, currentPage],
+    queryFn: () => fetchNotes(query, currentPage),
+    enabled: true,
   });
+
+useEffect(() => {
+    setCurrentPage(1);
+  }, [query]);
+
 const handleSearch = (value: string) => {
-    setQuery(value);
+  setQuery(value);
+
   };
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteNote(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notes'] });
+    },
+  });
+
+  const handleDeleteNote = (id: string) => {
+    deleteMutation.mutate(id);
+  }
+const handlePageChange = (page: number) => {
+  setCurrentPage(page);
+  }
 
 
   return (
@@ -28,7 +53,7 @@ const handleSearch = (value: string) => {
       <div className={css.app}>
         <header className={css.toolbar}>
           {<SearchBox handleSearch={handleSearch} />}
-          {/* Пагінація */}
+          {data && <Pagination currentPage={currentPage} totalPages={data.totalPages} onPageChange={handlePageChange} />}
           <button
             className={css.button}
             onClick={() => setIsOpenModal(true)}
@@ -37,8 +62,8 @@ const handleSearch = (value: string) => {
           </button>
         </header>
         {isLoading && <p>Loading...</p>}
-{error && <p>Error loading notes</p>}
-{data && <NoteList notes={data.notes} />}
+        {error && <p>Error loading notes</p>}
+        {data && <NoteList notes={data.notes} deleteNote={handleDeleteNote} />}
 
 
       </div>

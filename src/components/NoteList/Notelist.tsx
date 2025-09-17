@@ -3,9 +3,10 @@ import css from './NoteList.module.css';
 
 interface NoteListProps {
   notes: Note[];
+  deleteNote?: (id: string) => void;
 }
 
-export default function NoteList({ notes = [] }: NoteListProps) {
+export default function NoteList({ notes = [], deleteNote }: NoteListProps) {
   if (notes.length === 0) {
     return null; // нічого не рендеримо, якщо масив пустий
 
@@ -19,7 +20,7 @@ export default function NoteList({ notes = [] }: NoteListProps) {
           <p className={css.content}>{note.content}</p>
           <div className={css.footer}>
             <span className={css.tag}>{note.tag}</span>
-            <button className={css.button}>Delete</button>
+            <button onClick={() => deleteNote?.(note.id)} className={css.button}>Delete</button>
           </div>
         </li>
       ))}
