@@ -5,7 +5,7 @@ import type { NotesResponse } from "../../services/noteService";
 import { createNote, deleteNote, fetchNotes } from "../../services/noteService";
 import Modal from '../Modal/Modal';
 import NoteForm from '../NoteForm/NoteForm';
-import NoteList from '../NoteList/Notelist';
+import NoteList from '../NoteList/NoteList';
 import Pagination from "../Pagination/Pagination";
 import SearchBox from "../SearchBox/SearchBox";
 import css from './App.module.css';

@@ -6,7 +6,7 @@
     margin: 0;
     list-style: none;
   }
-  
+
   .listItem {
     background-color: #ffffff;
     border: 1px solid #dee2e6;
@@ -18,14 +18,14 @@
     justify-content: space-between;
     min-height: 180px;
   }
-  
+
   .title {
     font-size: 18px;
     font-weight: 600;
     margin: 0 0 8px 0;
     color: #212529;
   }
-  
+
   .content {
     margin: 0;
     flex-grow: 1;
@@ -33,11 +33,10 @@
     color: #495057;
     margin-bottom: 12px;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  
+
   .button {
     align-self: flex-end;
     padding: 6px 12px;
@@ -49,18 +48,18 @@
     cursor: pointer;
     transition: background-color 0.2s ease;
   }
-  
+
   .button:hover {
     background-color: #bb2d3b;
   }
-  
+
   .footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-top: auto;
   }
-  
+
   .tag {
     display: inline-block;
     padding: 4px 8px;
@@ -74,4 +73,3 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  
