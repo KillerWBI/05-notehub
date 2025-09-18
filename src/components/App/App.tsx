@@ -2,12 +2,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from 'react';
 import { useDebounce } from "use-debounce";
 import type { NotesResponse } from "../../services/noteService";
-import { deleteNote, fetchNotes } from "../../services/noteService";
+import { createNote, deleteNote, fetchNotes } from "../../services/noteService";
 import Modal from '../Modal/Modal';
 import NoteForm from '../NoteForm/NoteForm';
 import NoteList from '../NoteList/Notelist';
 import Pagination from "../Pagination/Pagination";
-import SearchBox from "../SearcBox/SearchBox";
+import SearchBox from "../SearchBox/SearchBox";
 import css from './App.module.css';
 
 
@@ -32,6 +32,12 @@ const handleSearch = (value: string) => {
   setQuery(value);
 
   };
+  const PostMutation = useMutation({
+    mutationFn: (data: { title: string; content: string; tag: string }) => createNote(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notes'] });
+    },
+  });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteNote(id),
@@ -39,11 +45,15 @@ const handleSearch = (value: string) => {
       queryClient.invalidateQueries({ queryKey: ['notes'] });
     },
   });
+  const handlePostNotes = (values: { title: string; content: string; tag: string }) => {
+    PostMutation.mutate(values);
+    setIsOpenModal(false);
+  }
 
   const handleDeleteNote = (id: string) => {
     deleteMutation.mutate(id);
   }
-const handlePageChange = (page: number) => {
+  const handlePageChange = (page: number) => {
   setCurrentPage(page);
   }
 
@@ -70,7 +80,7 @@ const handlePageChange = (page: number) => {
 
       {isOpenModal && (
         <Modal onClose={() => setIsOpenModal(false)}>
-          <NoteForm onCancel={() => setIsOpenModal(false)} />
+          <NoteForm onCancel={() => setIsOpenModal(false)} PostNotes={handlePostNotes} />
         </Modal>
       )}
     </>

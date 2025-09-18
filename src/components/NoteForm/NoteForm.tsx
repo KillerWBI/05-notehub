@@ -4,6 +4,7 @@ import css from "./NoteForm.module.css";
 
 interface NoteFormProps {
   onCancel: () => void;
+  PostNotes: (values: { title: string; content: string; tag: string }) => void;
 }
 
 const validationSchema = Yup.object({
@@ -18,18 +19,21 @@ const validationSchema = Yup.object({
     .required("Обов'язкове поле"),
 });
 
-export default function NoteForm({ onCancel }: NoteFormProps) {
+export default function NoteForm({ onCancel, PostNotes }: NoteFormProps) {
+
+
+
   return (
     <Formik
       initialValues={{ title: "", content: "", tag: "" }}
       validationSchema={validationSchema}
       onSubmit={(values, { resetForm }) => {
-        console.log("Submitted:", values);
+        PostNotes(values);
         resetForm();
       }}
     >
       {({ isSubmitting, isValid }) => (
-        <Form className={css.form}>
+        <Form className={css.form} >
           <div className={css.formGroup}>
             <label htmlFor="title">Title</label>
             <Field id="title" name="title" type="text" className={css.input} />

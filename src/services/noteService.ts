@@ -32,7 +32,7 @@ export async function fetchNotes(
 }
 
 // 2. Створити нову нотатку
-export async function createNote(data: Omit<Note, "id" | "createdAt" | "updatedAt">): Promise<Note> {
+export async function createNote(data: { title: string; content: string; tag: string }): Promise<Note> {
   const response: AxiosResponse<Note> = await api.post("/notes", data);
   return response.data;
 }
