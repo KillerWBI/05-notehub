@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from 'react';
 import { useDebounce } from "use-debounce";
 import type { NotesResponse } from "../../services/noteService";
-import { createNote, deleteNote, fetchNotes } from "../../services/noteService";
+import { deleteNote, fetchNotes } from "../../services/noteService";
 import Modal from '../Modal/Modal';
 import NoteForm from '../NoteForm/NoteForm';
 import NoteList from '../NoteList/NoteList';
@@ -15,29 +15,26 @@ function App() {
   const queryClient = useQueryClient();
 
   const [isOpenModal, setIsOpenModal] = useState(false);
-  const [query, setQuery] = useDebounce<string>('', 500);
+  const [query, setQuery] = useState('');
+  const [debouncedQuery] = useDebounce(query, 500);
   const [currentPage, setCurrentPage] = useState(1);
 
   const { data, isLoading, error } = useQuery<NotesResponse>({
-    queryKey: ['notes', query, currentPage],
-    queryFn: () => fetchNotes(query, currentPage),
+    queryKey: ['notes', debouncedQuery, currentPage],
+    queryFn: () => fetchNotes(debouncedQuery, currentPage),
     enabled: true,
+    placeholderData: (prev) => prev,
   });
 
 useEffect(() => {
     setCurrentPage(1);
-  }, [query]);
+  }, [debouncedQuery]);
 
 const handleSearch = (value: string) => {
   setQuery(value);
 
   };
-  const PostMutation = useMutation({
-    mutationFn: (data: { title: string; content: string; tag: string }) => createNote(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notes'] });
-    },
-  });
+
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteNote(id),
@@ -45,10 +42,7 @@ const handleSearch = (value: string) => {
       queryClient.invalidateQueries({ queryKey: ['notes'] });
     },
   });
-  const handlePostNotes = (values: { title: string; content: string; tag: string }) => {
-    PostMutation.mutate(values);
-    setIsOpenModal(false);
-  }
+
 
   const handleDeleteNote = (id: string) => {
     deleteMutation.mutate(id);
@@ -63,7 +57,7 @@ const handleSearch = (value: string) => {
       <div className={css.app}>
         <header className={css.toolbar}>
           {<SearchBox handleSearch={handleSearch} />}
-          {data && <Pagination currentPage={currentPage} totalPages={data.totalPages} onPageChange={handlePageChange} />}
+          {data && data.totalPages > 1 && (<Pagination currentPage={currentPage} totalPages={data.totalPages} onPageChange={handlePageChange} />)}
           <button
             className={css.button}
             onClick={() => setIsOpenModal(true)}
@@ -80,7 +74,7 @@ const handleSearch = (value: string) => {
 
       {isOpenModal && (
         <Modal onClose={() => setIsOpenModal(false)}>
-          <NoteForm onCancel={() => setIsOpenModal(false)} PostNotes={handlePostNotes} />
+          <NoteForm onCancel={() => setIsOpenModal(false)}/>
         </Modal>
       )}
     </>

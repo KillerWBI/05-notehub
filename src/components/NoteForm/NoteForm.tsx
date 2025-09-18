@@ -1,10 +1,11 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from "yup";
+import { createNote } from "../../services/noteService";
 import css from "./NoteForm.module.css";
 
 interface NoteFormProps {
   onCancel: () => void;
-  PostNotes: (values: { title: string; content: string; tag: string }) => void;
 }
 
 const validationSchema = Yup.object({
@@ -19,16 +20,23 @@ const validationSchema = Yup.object({
     .required("Обов'язкове поле"),
 });
 
-export default function NoteForm({ onCancel, PostNotes }: NoteFormProps) {
+export default function NoteForm({ onCancel }: NoteFormProps) {
+  const queryClient = useQueryClient();
 
-
+  const mutation = useMutation({
+    mutationFn: (values: { title: string; content: string; tag: string }) => createNote(values),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notes'] });
+      onCancel(); // закрыть модалку после успешного создания
+    },
+  });
 
   return (
     <Formik
       initialValues={{ title: "", content: "", tag: "" }}
       validationSchema={validationSchema}
       onSubmit={(values, { resetForm }) => {
-        PostNotes(values);
+        mutation.mutate(values);
         resetForm();
       }}
     >
