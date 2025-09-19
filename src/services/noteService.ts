@@ -14,7 +14,6 @@ export const api = axios.create({
 export interface NotesResponse {
   notes: Note[];
   totalPages: number;
-  totalResults: number;
 }
 
 // 1. Отримати список нотаток (підтримує пагінацію та пошук)
