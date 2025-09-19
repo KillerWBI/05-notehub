@@ -1,8 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from 'react';
 import { useDebounce } from "use-debounce";
 import type { NotesResponse } from "../../services/noteService";
-import { deleteNote, fetchNotes } from "../../services/noteService";
+import { fetchNotes } from "../../services/noteService";
 import Modal from '../Modal/Modal';
 import NoteForm from '../NoteForm/NoteForm';
 import NoteList from '../NoteList/NoteList';
@@ -12,7 +12,7 @@ import css from './App.module.css';
 
 
 function App() {
-  const queryClient = useQueryClient();
+
 
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [query, setQuery] = useState('');
@@ -36,17 +36,6 @@ const handleSearch = (value: string) => {
   };
 
 
-  const deleteMutation = useMutation({
-    mutationFn: (id: string) => deleteNote(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notes'] });
-    },
-  });
-
-
-  const handleDeleteNote = (id: string) => {
-    deleteMutation.mutate(id);
-  }
   const handlePageChange = (page: number) => {
   setCurrentPage(page);
   }
@@ -67,7 +56,7 @@ const handleSearch = (value: string) => {
         </header>
         {isLoading && <p>Loading...</p>}
         {error && <p>Error loading notes</p>}
-        {data && <NoteList notes={data.notes} deleteNote={handleDeleteNote} />}
+        {data && <NoteList notes={data.notes}/>}
 
 
       </div>
